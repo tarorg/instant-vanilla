@@ -22,13 +22,17 @@ const db = init({ appId: APP_ID, schema });
 
 // Subscribe to data
 // ---------
-db.subscribeQuery({ todos: {} }, (resp: { error?: { message: string }; data?: Todo[] }) => {
+db.subscribeQuery({ todos: {} }, (resp: { error?: { message: string }; data?: { todos: Todo[] } }) => {
   if (resp.error) {
     renderError(resp.error.message); // Pro-tip: Check you have the right appId!
     return;
   }
   if (resp.data) {
-    render(resp.data);
+    console.log("Received data:", resp.data); // Log the received data
+    console.log("Todos structure:", resp.data.todos); // Log the todos array
+    render(resp.data.todos);
+  } else {
+    console.log("No data received");
   }
 });
 
@@ -152,10 +156,9 @@ const styles: Record<string, string> = {
 const app = document.getElementById("app")!;
 app.style.cssText = styles.container;
 
-function render(data: { todos: Todo[] }) {
+function render(todos: Todo[]) {
+  console.log("Rendering todos:", todos); // Log the todos being rendered
   app.innerHTML = "";
-
-  const { todos } = data;
 
   const containerHTML = `
     <div style="${styles.container}">
@@ -163,9 +166,7 @@ function render(data: { todos: Todo[] }) {
       ${TodoForm()}
       ${TodoList(todos)}
       ${ActionBar(todos)}
-      <div style="${
-        styles.footer
-      }">Open another tab to see todos update in realtime!</div>
+      <div style="${styles.footer}">Open another tab to see todos update in realtime!</div>
     </div>
   `;
 
@@ -256,3 +257,10 @@ function submitForm(event: Event) {
     input.value = "";
   }
 }
+
+const testTodos: Todo[] = [
+    { id: "1", text: "Test Todo 1", done: false, createdAt: Date.now() },
+    { id: "2", text: "Test Todo 2", done: true, createdAt: Date.now() },
+];
+
+render(testTodos); // Call render with static data
