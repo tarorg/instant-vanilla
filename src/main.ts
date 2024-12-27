@@ -22,7 +22,7 @@ const db = init({ appId: APP_ID, schema });
 
 // Subscribe to data
 // ---------
-db.subscribeQuery({ todos: {} }, (resp) => {
+db.subscribeQuery({ todos: {} }, (resp: { error?: { message: string }; data?: Todo[] }) => {
   if (resp.error) {
     renderError(resp.error.message); // Pro-tip: Check you have the right appId!
     return;
